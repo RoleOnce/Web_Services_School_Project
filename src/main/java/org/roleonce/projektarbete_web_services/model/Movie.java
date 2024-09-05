@@ -1,17 +1,23 @@
 package org.roleonce.projektarbete_web_services.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "Movies")
 public class Movie {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String title;
     private String overview;
     private String releaseDate;
     private double voteAverage;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
