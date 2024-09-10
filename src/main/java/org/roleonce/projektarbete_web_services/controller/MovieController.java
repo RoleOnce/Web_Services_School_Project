@@ -1,14 +1,13 @@
 package org.roleonce.projektarbete_web_services.controller;
 
 import org.roleonce.projektarbete_web_services.model.Movie;
+import org.roleonce.projektarbete_web_services.model.Rating;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
+import org.roleonce.projektarbete_web_services.repository.RatingRepository;
 import org.roleonce.projektarbete_web_services.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,11 +16,13 @@ import java.util.List;
 public class MovieController {
 
     private final MovieRepository movieRepository;
+    private final RatingRepository ratingRepository;
     private ApiService apiService;
 
     @Autowired
-    public MovieController(MovieRepository movieRepository) {
+    public MovieController(MovieRepository movieRepository, RatingRepository ratingRepository) {
         this.movieRepository = movieRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @GetMapping
@@ -32,6 +33,17 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public Movie getMovie(@PathVariable int id) {
-        return apiService.getMovieId(id);
+
+        return apiService.getMovieWithId(id);
     }
+
+    @PostMapping("/{id}/rating")
+    public ResponseEntity<String> postRating(@PathVariable int id, @RequestParam double rating) {
+
+        Rating newRating = new Rating(id, rating);
+        ratingRepository.save(newRating);
+
+        return ResponseEntity.ok("Rating added to " + id);
+    }
+
 }
