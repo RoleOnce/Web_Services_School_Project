@@ -1,5 +1,6 @@
 package org.roleonce.projektarbete_web_services.controller;
 
+import org.apache.coyote.Response;
 import org.roleonce.projektarbete_web_services.model.Movie;
 import org.roleonce.projektarbete_web_services.model.Rating;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
@@ -8,7 +9,6 @@ import org.roleonce.projektarbete_web_services.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -44,6 +44,15 @@ public class MovieController {
         ratingRepository.save(newRating);
 
         return ResponseEntity.ok("Rating added to " + id);
+    }
+
+    @PostMapping("/save/{id}")
+    public ResponseEntity<String> saveMovie(@PathVariable int id) {
+
+        Movie movieFromApi = apiService.getMovieWithId(id);
+        movieRepository.save(movieFromApi);
+
+        return ResponseEntity.ok("Movie saved with ID: " + movieFromApi.getId());
     }
 
 }
