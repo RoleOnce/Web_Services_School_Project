@@ -17,12 +17,13 @@ public class MovieController {
 
     private final MovieRepository movieRepository;
     private final RatingRepository ratingRepository;
-    private ApiService apiService;
+    private final ApiService apiService;
 
     @Autowired
-    public MovieController(MovieRepository movieRepository, RatingRepository ratingRepository) {
+    public MovieController(MovieRepository movieRepository, RatingRepository ratingRepository, ApiService apiService) {
         this.movieRepository = movieRepository;
         this.ratingRepository = ratingRepository;
+        this.apiService = apiService;
     }
 
     @GetMapping
@@ -47,12 +48,9 @@ public class MovieController {
     }
 
     @PostMapping("/save/{id}")
-    public ResponseEntity<String> saveMovie(@PathVariable int id) {
+    public Movie saveMovie(@PathVariable int id) {
 
-        Movie movieFromApi = apiService.getMovieWithId(id);
-        movieRepository.save(movieFromApi);
-
-        return ResponseEntity.ok("Movie saved with ID: " + movieFromApi.getId());
+        return apiService.saveMovieWithId(id);
     }
 
 }
