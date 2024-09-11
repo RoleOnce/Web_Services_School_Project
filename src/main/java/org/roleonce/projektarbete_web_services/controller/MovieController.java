@@ -57,7 +57,7 @@ public class MovieController {
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<Movie> updateMovieWithId(@PathVariable Long id, @RequestBody Movie movie) {
+    public ResponseEntity<Movie> updateMovieById(@PathVariable Long id, @RequestBody Movie movie) {
 
         Optional<Movie> updateMovie = movieRepository.findById(id);
 
@@ -82,6 +82,15 @@ public class MovieController {
         } else {
             return ResponseEntity.notFound().build(); // Returnera 404 om filmen inte hittas
         }
+    }
+
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<String> deleteMovieById(@PathVariable Long id) {
+
+        Optional<Movie> movie = movieRepository.findById(id);
+
+        movie.ifPresent(movieRepository::delete);
+        return ResponseEntity.ok("Movie deleted");
     }
 
 }
