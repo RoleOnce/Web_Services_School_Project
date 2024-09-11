@@ -7,9 +7,12 @@ import org.roleonce.projektarbete_web_services.repository.MovieRepository;
 import org.roleonce.projektarbete_web_services.repository.RatingRepository;
 import org.roleonce.projektarbete_web_services.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/movies")
@@ -47,10 +50,38 @@ public class MovieController {
         return ResponseEntity.ok("Rating added to " + id);
     }
 
-    @PostMapping("/save/{id}")
+    @PostMapping("/{id}/save")
     public Movie saveMovie(@PathVariable int id) {
 
         return apiService.saveMovieWithId(id);
+    }
+
+    @PutMapping("/{id}/update")
+    public ResponseEntity<Movie> updateMovieWithId(@PathVariable Long id, @RequestBody Movie movie) {
+
+        Optional<Movie> updateMovie = movieRepository.findById(id);
+
+        if (updateMovie.isPresent()) {
+            Movie existingMovie = updateMovie.get();
+            if (movie.getTitle() != null) {
+                existingMovie.setTitle(movie.getTitle());
+            }
+            if (movie.getOverview() != null) {
+                existingMovie.setOverview(movie.getOverview());
+            }
+            if (movie.getReleaseDate() != null) {
+                existingMovie.setReleaseDate(movie.getReleaseDate());
+            }
+            if (movie.getVoteAverage() != null) {
+                existingMovie.setVoteAverage(movie.getVoteAverage());
+            }
+
+            movieRepository.save(existingMovie);
+
+            return ResponseEntity.ok(existingMovie);
+        } else {
+            return ResponseEntity.notFound().build(); // Returnera 404 om filmen inte hittas
+        }
     }
 
 }

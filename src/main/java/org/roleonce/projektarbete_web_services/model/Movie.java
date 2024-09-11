@@ -12,7 +12,7 @@ public class Movie {
     private String title;
     private String overview;
     private String releaseDate;
-    private double voteAverage;
+    private Double voteAverage;
 
     public Movie() {}
 
@@ -35,7 +35,7 @@ public class Movie {
     public String getReleaseDate() {return releaseDate;}
     public void setReleaseDate(String releaseDate) {this.releaseDate = releaseDate;}
 
-    public double getVoteAverage() {return voteAverage;}
-    public void setVoteAverage(double voteAverage) {this.voteAverage = voteAverage;}
+    public Double getVoteAverage() {return voteAverage;}
+    public void setVoteAverage(Double voteAverage) {this.voteAverage = voteAverage;}
 
 }
