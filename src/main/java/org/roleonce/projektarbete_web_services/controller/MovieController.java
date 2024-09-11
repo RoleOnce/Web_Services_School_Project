@@ -1,13 +1,9 @@
 package org.roleonce.projektarbete_web_services.controller;
 
-import org.apache.coyote.Response;
 import org.roleonce.projektarbete_web_services.model.Movie;
-import org.roleonce.projektarbete_web_services.model.Rating;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
-import org.roleonce.projektarbete_web_services.repository.RatingRepository;
 import org.roleonce.projektarbete_web_services.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,13 +15,11 @@ import java.util.Optional;
 public class MovieController {
 
     private final MovieRepository movieRepository;
-    private final RatingRepository ratingRepository;
     private final ApiService apiService;
 
     @Autowired
-    public MovieController(MovieRepository movieRepository, RatingRepository ratingRepository, ApiService apiService) {
+    public MovieController(MovieRepository movieRepository, ApiService apiService) {
         this.movieRepository = movieRepository;
-        this.ratingRepository = ratingRepository;
         this.apiService = apiService;
     }
 
@@ -41,13 +35,20 @@ public class MovieController {
         return apiService.getMovieWithId(id);
     }
 
-    @PostMapping("/{id}/rating")
-    public ResponseEntity<String> postRating(@PathVariable int id, @RequestParam double rating) {
+    @PostMapping("/{id}/review")
+    public ResponseEntity<String> postReview(@PathVariable Long id, @RequestBody Movie movie) {
 
-        Rating newRating = new Rating(id, rating);
-        ratingRepository.save(newRating);
+        Optional<Movie> reviewMovie = movieRepository.findById(id);
 
-        return ResponseEntity.ok("Rating added to " + id);
+        if (reviewMovie.isPresent()) {
+            Movie existingMovie = reviewMovie.get();
+            existingMovie.setMovie_review(movie.getMovie_review());
+
+            movieRepository.save(movie);
+
+            return ResponseEntity.ok("REVIEW added to " + id);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/{id}/save")
@@ -69,11 +70,14 @@ public class MovieController {
             if (movie.getOverview() != null) {
                 existingMovie.setOverview(movie.getOverview());
             }
-            if (movie.getReleaseDate() != null) {
-                existingMovie.setReleaseDate(movie.getReleaseDate());
+            if (movie.getMovie_review() != null) {
+                existingMovie.setMovie_review(movie.getMovie_review());
             }
-            if (movie.getVoteAverage() != null) {
-                existingMovie.setVoteAverage(movie.getVoteAverage());
+            if (movie.getRelease_date() != null) {
+                existingMovie.setRelease_date(movie.getRelease_date());
+            }
+            if (movie.getVote_average() != null) {
+                existingMovie.setVote_average(movie.getVote_average());
             }
 
             movieRepository.save(existingMovie);

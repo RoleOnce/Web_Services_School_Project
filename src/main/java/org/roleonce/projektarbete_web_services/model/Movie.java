@@ -11,31 +11,60 @@ public class Movie {
     private Long id;
     private String title;
     private String overview;
-    private String releaseDate;
-    private Double voteAverage;
+    private String movie_review;
+    private String release_date;
+    private double vote_average;
 
     public Movie() {}
 
-    public Movie(String title, String overview, String releaseDate, double voteAverage) {
+    public Movie(String title, String overview, String movieReview, String release_date, double vote_average) {
         this.title = title;
         this.overview = overview;
-        this.releaseDate = releaseDate;
-        this.voteAverage = voteAverage;
+        this.movie_review = movieReview;
+        this.release_date = release_date;
+        this.vote_average = vote_average;
     }
 
-    public Long getId() {return id;}
-    public void setId(Long id) {this.id = id;}
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getTitle() {return title;}
-    public void setTitle(String title) {this.title = title;}
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getOverview() {return overview;}
-    public void setOverview(String overview) {this.overview = overview;}
+    public String getOverview() {
+        return overview;
+    }
+    public void setOverview(String overview) {
+        this.overview = overview;
+    }
 
-    public String getReleaseDate() {return releaseDate;}
-    public void setReleaseDate(String releaseDate) {this.releaseDate = releaseDate;}
+    public String getMovie_review() {
+        return movie_review;
+    }
+    public void setMovie_review(String movieReview) {
+        this.movie_review = movieReview;
+    }
 
-    public Double getVoteAverage() {return voteAverage;}
-    public void setVoteAverage(Double voteAverage) {this.voteAverage = voteAverage;}
+    public String getRelease_date() {
+        return release_date;
+    }
+    public void setRelease_date(String release_date) {
+        this.release_date = release_date;
+    }
+
+    public Double getVote_average() {
+        return vote_average;
+    }
+    public void setVote_average(Double vote_average) {
+        this.vote_average = vote_average;
+    }
 
 }
