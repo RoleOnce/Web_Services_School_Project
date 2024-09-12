@@ -2,6 +2,7 @@ package org.roleonce.projektarbete_web_services.controller;
 
 import org.roleonce.projektarbete_web_services.model.Movie;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
+import org.roleonce.projektarbete_web_services.response.ErrorResponse;
 import org.roleonce.projektarbete_web_services.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -52,9 +53,9 @@ public class MovieController {
     }
 
     @PostMapping("/{id}/save")
-    public Movie saveMovie(@PathVariable int id) {
+    public ResponseEntity<ErrorResponse> saveMovie(@PathVariable int id) {
 
-        return apiService.saveMovieWithId(id);
+        return (ResponseEntity<ErrorResponse>) apiService.saveMovieWithId(id);
     }
 
     @PutMapping("/{id}/update")

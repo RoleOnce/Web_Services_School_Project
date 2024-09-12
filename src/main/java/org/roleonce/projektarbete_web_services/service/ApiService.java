@@ -30,7 +30,8 @@ public class ApiService {
             if (response.getStatusCode().is2xxSuccessful()) {
                 return ResponseEntity.ok(response.getBody());
             }
-            return ResponseEntity.status(response.getStatusCode())
+            return ResponseEntity
+                    .status(response.getStatusCode())
                     .body(new ErrorResponse("Unexpected error: " + response.getStatusCode()));
 
         } catch (HttpClientErrorException.NotFound e) {
@@ -38,17 +39,29 @@ public class ApiService {
         }
     }
 
-    public Movie saveMovieWithId(int movieId) {
+    public ResponseEntity<?> saveMovieWithId(int movieId) {
         String url = apiUrl + movieId + "?api_key=" + apiKey;
-        Movie movie = restTemplate.getForObject(url, Movie.class);
 
-        if (movie != null) {
+        try {
+            Movie movie = restTemplate.getForObject(url, Movie.class);
+
+            if (movie == null) {
+                return ResponseEntity
+                        .status(404)
+                        .body(new ErrorResponse("Movie not found."));
+            }
             if (movie.getOverview().length() > 254) {
                 movie.setOverview(movie.getOverview().substring(0, 254));
             }
+
             movieRepository.save(movie);
+            return ResponseEntity.ok(movie);
+
+        } catch (HttpClientErrorException.NotFound e) {
+            return ResponseEntity
+                    .status(404)
+                    .body(new ErrorResponse("Movie couldn't be saved due to not found"));
         }
-        return movie;
     }
 
 }
