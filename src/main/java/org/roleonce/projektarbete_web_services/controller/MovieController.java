@@ -30,7 +30,7 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public Movie getMovie(@PathVariable int id) {
+    public ResponseEntity<?> getMovie(@PathVariable int id) {
 
         return apiService.getMovieWithId(id);
     }
