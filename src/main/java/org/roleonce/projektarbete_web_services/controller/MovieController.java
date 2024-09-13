@@ -2,6 +2,7 @@ package org.roleonce.projektarbete_web_services.controller;
 
 import org.roleonce.projektarbete_web_services.model.Movie;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
+import org.roleonce.projektarbete_web_services.response.ErrorResponse;
 import org.roleonce.projektarbete_web_services.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,12 @@ public class MovieController {
     public ResponseEntity<?> getMovie(@PathVariable int id) {
 
         return apiService.getMovieById(id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchMovie(@RequestParam("title") String title) {
+
+        return apiService.searchForMoviesByTitle(title);
     }
 
     @PostMapping("/{id}/review")
