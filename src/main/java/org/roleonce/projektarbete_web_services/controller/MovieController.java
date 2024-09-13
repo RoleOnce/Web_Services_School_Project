@@ -35,7 +35,7 @@ public class MovieController {
     }
 
     @PostMapping("/{id}/review")
-    public ResponseEntity<String> postReview(@PathVariable Long id, @RequestBody Movie movie) {
+    public ResponseEntity<?> postReview(@PathVariable Long id, @RequestBody Movie movie) {
 
         return apiService.postAReviewById(id, movie);
     }
@@ -47,7 +47,7 @@ public class MovieController {
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
+    public ResponseEntity<?> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
 
         return apiService.updateMovieCredentialsById(id, movie);
     }

@@ -71,51 +71,69 @@ public class ApiService {
 
         Optional<Movie> movie = movieRepository.findById(movieId);
 
-        movie.ifPresent(movieRepository::delete);
+        if (movie.isEmpty()) {
+            return ResponseEntity.status(404).body("Movie not found in database.");
+        }
+
+        movieRepository.deleteById(movieId);
         return ResponseEntity.ok().body("Movie deleted successfully.");
     }
 
-    public ResponseEntity<Movie> updateMovieCredentialsById(Long movieId, @RequestBody Movie movie) {
-        Optional<Movie> updateMovie = movieRepository.findById(movieId);
+    public ResponseEntity<?> updateMovieCredentialsById(Long movieId, @RequestBody Movie movie) {
 
-        if (updateMovie.isPresent()) {
-            Movie existingMovie = updateMovie.get();
-            if (movie.getTitle() != null) {
-                existingMovie.setTitle(movie.getTitle());
-            }
-            if (movie.getOverview() != null) {
-                existingMovie.setOverview(movie.getOverview());
-            }
-            if (movie.getMovie_review() != null) {
-                existingMovie.setMovie_review(movie.getMovie_review());
-            }
-            if (movie.getRelease_date() != null) {
-                existingMovie.setRelease_date(movie.getRelease_date());
-            }
-            if (movie.getVote_average() != null) {
-                existingMovie.setVote_average(movie.getVote_average());
-            }
+        try {
+            Optional<Movie> updateMovie = movieRepository.findById(movieId);
 
-            movieRepository.save(existingMovie);
+            if (updateMovie.isPresent()) {
+                Movie existingMovie = updateMovie.get();
 
-            return ResponseEntity.ok(existingMovie);
+                if (movie.getTitle() != null) {
+                    existingMovie.setTitle(movie.getTitle());
+                }
+                if (movie.getOverview() != null) {
+                    existingMovie.setOverview(movie.getOverview());
+                }
+                if (movie.getMovie_review() != null) {
+                    existingMovie.setMovie_review(movie.getMovie_review());
+                }
+                if (movie.getRelease_date() != null) {
+                    existingMovie.setRelease_date(movie.getRelease_date());
+                }
+                if (movie.getVote_average() != null) {
+                    existingMovie.setVote_average(movie.getVote_average());
+                }
+
+                movieRepository.save(existingMovie);
+
+                return ResponseEntity.ok(existingMovie);
         } else {
-            return ResponseEntity.notFound().build(); // Returnera 404 om filmen inte hittas
+            return ResponseEntity
+                    .status(404)
+                    .body(new ErrorResponse("Can't update a non-existing movie")); // Returnera 404 om filmen inte hittas
         }
+    } catch (HttpClientErrorException.NotFound e) {
+        return ResponseEntity
+                .status(500)
+                .body(new ErrorResponse("Can't update movie credentials: " + e.getMessage()));}
     }
 
-    public ResponseEntity<String> postAReviewById(Long movieId, @RequestBody Movie movie) {
-        Optional<Movie> reviewMovie = movieRepository.findById(movieId);
+    public ResponseEntity<?> postAReviewById(Long movieId, @RequestBody Movie movie) {
 
-        if (reviewMovie.isPresent()) {
-            Movie existingMovie = reviewMovie.get();
-            existingMovie.setMovie_review(movie.getMovie_review());
+        try {
+            Optional<Movie> reviewMovie = movieRepository.findById(movieId);
+            if (reviewMovie.isPresent()) {
+                Movie existingMovie = reviewMovie.get();
+                existingMovie.setMovie_review(movie.getMovie_review());
 
-            movieRepository.save(movie);
+                movieRepository.save(existingMovie);
 
-            return ResponseEntity.ok("Review added to movie with id: " + movieId);
+                return ResponseEntity.ok("Review added to movie with id: " + movieId);
+            }
+        } catch (HttpClientErrorException.NotFound e) {
+            return ResponseEntity.status(500).body(new ErrorResponse("Error occurred with message :" + e.getMessage()));
         }
-        return ResponseEntity.notFound().build();
+
+        return ResponseEntity.status(404).body(new ErrorResponse("Movie not found in database. Couldn't add review"));
     }
 
 }
