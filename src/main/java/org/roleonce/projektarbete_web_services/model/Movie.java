@@ -1,5 +1,6 @@
 package org.roleonce.projektarbete_web_services.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -17,7 +18,8 @@ public class Movie {
 
     public Movie() {}
 
-    public Movie(String title, String overview, String movieReview, String release_date, double vote_average) {
+    public Movie(Long id, String title, String overview, String movieReview, String release_date, double vote_average) {
+        this.id = id;
         this.title = title;
         this.overview = overview;
         this.movie_review = movieReview;

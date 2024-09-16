@@ -3,6 +3,7 @@ package org.roleonce.projektarbete_web_services.controller;
 import org.roleonce.projektarbete_web_services.model.Movie;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
 import org.roleonce.projektarbete_web_services.response.ErrorResponse;
+import org.roleonce.projektarbete_web_services.response.WsResponse;
 import org.roleonce.projektarbete_web_services.service.ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,31 +31,31 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMovie(@PathVariable int id) {
+    public ResponseEntity<WsResponse> getMovie(@PathVariable int id) {
 
         return apiService.getMovieById(id);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchMovie(@RequestParam("title") String title) {
+    public ResponseEntity<WsResponse> searchMovie(@RequestParam("title") String title) {
 
         return apiService.searchForMoviesByTitle(title);
     }
 
     @PostMapping("/{id}/review")
-    public ResponseEntity<?> postReview(@PathVariable Long id, @RequestBody Movie movie) {
+    public ResponseEntity<WsResponse> postReview(@PathVariable Long id, @RequestBody Movie movie) {
 
         return apiService.postAReviewById(id, movie);
     }
 
     @PostMapping("/{id}/save")
-    public ResponseEntity<?> saveMovie(@PathVariable int id) {
+    public ResponseEntity<WsResponse> saveMovie(@PathVariable int id) {
 
         return apiService.saveMovieById(id);
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<?> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
+    public ResponseEntity<WsResponse> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
 
         return apiService.updateMovieCredentialsById(id, movie);
     }
