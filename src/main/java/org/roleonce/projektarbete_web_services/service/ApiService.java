@@ -6,6 +6,7 @@ import org.roleonce.projektarbete_web_services.response.ErrorResponse;
 import org.roleonce.projektarbete_web_services.response.MovieResponse;
 import org.roleonce.projektarbete_web_services.response.WsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +25,9 @@ public class ApiService {
     @Autowired
     private MovieRepository movieRepository;
 
+    @Value("${api.key}")
+    private String apiKey;
     final String apiUrl = "https://api.themoviedb.org/3/movie/";
-    final String apiKey = "270c87c7d9febee8d8c0856291ff4572";
 
     public ResponseEntity<WsResponse> getMovieById(int movieId) {
 
