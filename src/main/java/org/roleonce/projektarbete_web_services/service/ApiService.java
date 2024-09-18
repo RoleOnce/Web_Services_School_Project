@@ -3,6 +3,7 @@ package org.roleonce.projektarbete_web_services.service;
 import org.roleonce.projektarbete_web_services.model.Movie;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
 import org.roleonce.projektarbete_web_services.response.ErrorResponse;
+import org.roleonce.projektarbete_web_services.response.ListResponse;
 import org.roleonce.projektarbete_web_services.response.MovieResponse;
 import org.roleonce.projektarbete_web_services.response.WsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +31,26 @@ public class ApiService {
     private String apiKey;
     final String apiUrl = "https://api.themoviedb.org/3/movie/";
 
-    public ResponseEntity<WsResponse> getMovieById(int movieId) {
+    public ResponseEntity<WsResponse> getMoviesByCountry(String country, String title) {
+
+        List<Movie> movies;
+
+        if (title != null && !title.isEmpty()) {
+            // om land och titel är angivna så kör denna
+            movies = movieRepository.findByOriginCountryAndTitle(Collections.singletonList(country), title);
+        } else {
+            // om endast land angivs kör denna
+            movies = movieRepository.findByOriginCountry(Collections.singletonList(country));
+        }
+
+        if (movies.isEmpty()) {
+            return ResponseEntity.status(404).body(new ErrorResponse("No movies found for the country: " + country + " with the title: " + title));
+        }
+
+        return ResponseEntity.ok(new ListResponse(movies));
+    }
+
+    public ResponseEntity<WsResponse> getMovieById(Long movieId) {
 
         String url = apiUrl + movieId + "?api_key=" + apiKey;
 
@@ -51,7 +72,7 @@ public class ApiService {
         }
     }
 
-    public ResponseEntity<WsResponse> saveMovieById(int movieId) {
+    public ResponseEntity<WsResponse> saveMovieById(Long movieId) {
 
         String url = apiUrl + movieId + "?api_key=" + apiKey;
 
@@ -113,6 +134,9 @@ public class ApiService {
                 }
                 if (movie.getRelease_date() != null) {
                     existingMovie.setRelease_date(movie.getRelease_date());
+                }
+                if (movie.getOriginCountry() != null) {
+                    existingMovie.setOriginCountry(movie.getOriginCountry());
                 }
                 if (movie.getVote_average() != null) {
                     existingMovie.setVote_average(movie.getVote_average());
