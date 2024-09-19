@@ -4,7 +4,6 @@ import org.roleonce.projektarbete_web_services.model.Movie;
 import org.roleonce.projektarbete_web_services.repository.MovieRepository;
 import org.roleonce.projektarbete_web_services.response.WsResponse;
 import org.roleonce.projektarbete_web_services.service.ApiService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +16,6 @@ public class MovieController {
     private final MovieRepository movieRepository;
     private final ApiService apiService;
 
-    @Autowired
     public MovieController(ApiService apiService, MovieRepository movieRepository) {
         this.apiService = apiService;
         this.movieRepository = movieRepository;
@@ -35,16 +33,23 @@ public class MovieController {
         return ResponseEntity.ok(movieRepository.findAll());
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<WsResponse> searchMovie(@RequestParam("title") String title) {
+    @GetMapping("/search/{title}")
+    public ResponseEntity<WsResponse> searchMovie(@PathVariable("title") String title,
+                                                  @RequestParam(value = "country", required = false) List<String> country) {
 
-        return apiService.searchForMoviesByTitle(title);
+        return apiService.searchMoviesByTitleAndCountry(title, country);
     }
 
-    @GetMapping("/country/{country}")
-    public ResponseEntity<WsResponse> getAllMovies(@PathVariable("country") String country, @RequestParam(value = "title", required = false) String title) {
+    @GetMapping("/budget")
+    public ResponseEntity<List<Movie>> getBudgetOfMovies() {
 
-        return apiService.getMoviesByCountry(country, title);
+        return apiService.budgetHighToLow();
+    }
+
+    @GetMapping("/rating")
+    public ResponseEntity<List<Movie>> getRatingOfMovies() {
+
+        return apiService.ratingHighToLow();
     }
 
     @PostMapping("/{id}/review")

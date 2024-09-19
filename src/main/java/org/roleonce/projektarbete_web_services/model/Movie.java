@@ -17,18 +17,21 @@ public class Movie {
     private String release_date;
     @JsonProperty("origin_country")
     private List<String> originCountry;
-    private double vote_average;
+    @JsonProperty("vote_average")
+    private double voteAverage;
+    private int budget;
 
     public Movie() {}
 
-    public Movie(Long id, String title, String overview, String movieReview, String release_date, List<String> origin_country, double vote_average) {
+    public Movie(Long id, String title, String overview, String movieReview, String release_date, List<String> origin_country, double vote_average, int budget) {
         this.id = id;
         this.title = title;
         this.overview = overview;
         this.movie_review = movieReview;
         this.release_date = release_date;
         this.originCountry = origin_country;
-        this.vote_average = vote_average;
+        this.voteAverage = vote_average;
+        this.budget = budget;
     }
 
     public Long getId() {
@@ -73,11 +76,17 @@ public class Movie {
         this.originCountry = origin_country;
     }
 
-    public Double getVote_average() {
-        return vote_average;
+    public Double getVoteAverage() {
+        return voteAverage;
     }
-    public void setVote_average(Double vote_average) {
-        this.vote_average = vote_average;
+    public void setVoteAverage(Double vote_average) {
+        this.voteAverage = vote_average;
     }
 
+    public int getBudget() {
+        return budget;
+    }
+    public void setBudget(int budget) {
+        this.budget = budget;
+    }
 }
