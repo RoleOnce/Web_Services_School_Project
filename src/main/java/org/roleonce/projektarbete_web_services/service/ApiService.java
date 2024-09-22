@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -45,11 +46,14 @@ public class ApiService {
             return ResponseEntity
                     .status(response.getStatusCode())
                     .body(new ErrorResponse("Unexpected error: " + response.getStatusCode()));
-
         } catch (HttpClientErrorException.NotFound e) {
             return ResponseEntity
                     .status(404)
                     .body(new ErrorResponse("Movie not found."));
+        } catch (ResourceAccessException e) {
+            return ResponseEntity
+                    .status(503)
+                    .body(new ErrorResponse("Service unavailable. Please check your network connection."));
         }
     }
 
@@ -64,29 +68,40 @@ public class ApiService {
                 movies = movieRepository.findByTitle(title);
             }
             if (movies.isEmpty()) {
-                return ResponseEntity.status(404).body(new ErrorResponse("No movies found for the title: " + title + " with the country: " + country));
+                return ResponseEntity
+                        .status(404)
+                        .body(new ErrorResponse("No movies found for the title: " + title + " with the country: " + country));
             }
 
             return ResponseEntity.ok(new ListResponse(movies));
+
         } catch (HttpClientErrorException.NotFound e) {
-            return ResponseEntity.status(500).body(new ErrorResponse("Unexpected error: " + e.getStatusCode()));
+            return ResponseEntity
+                    .status(500)
+                    .body(new ErrorResponse("Unexpected error: " + e.getStatusCode()));
         }
     }
-    // TODO - TRY/CATCH
+
     public ResponseEntity<List<Movie>> budgetHighToLow() {
 
         List<Movie> movie = movieRepository.findAllByOrderByBudgetDesc();
 
         try {
             if (movie.isEmpty()) {
-                return ResponseEntity.status(404).body(null);
+                return ResponseEntity
+                        .status(404)
+                        .body(null);
             }
+
             return ResponseEntity.ok(movie);
+
         } catch (HttpClientErrorException.NotFound e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity
+                    .status(500)
+                    .body(null);
         }
     }
-    // TODO - TRY/CATCH
+
     public ResponseEntity<List<Movie>> ratingHighToLow() {
 
         List<Movie> movie = movieRepository.findAllByOrderByVoteAverageDesc();
@@ -95,9 +110,13 @@ public class ApiService {
             if (movie.isEmpty()) {
                 return ResponseEntity.status(404).body(null);
             }
+
             return ResponseEntity.ok(movie);
+
         } catch (HttpClientErrorException.NotFound e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity
+                    .status(500)
+                    .body(null);
         }
     }
 
@@ -105,19 +124,23 @@ public class ApiService {
 
         try {
             Optional<Movie> reviewMovie = movieRepository.findById(movieId);
+
             if (reviewMovie.isPresent()) {
                 Movie existingMovie = reviewMovie.get();
                 existingMovie.setMovie_review(movie.getMovie_review());
 
                 movieRepository.save(existingMovie);
-
                 return ResponseEntity.ok(new MovieResponse(existingMovie));
-            }
-        } catch (HttpClientErrorException.NotFound e) {
-            return ResponseEntity.status(500).body(new ErrorResponse("Error occurred with message :" + e.getMessage()));
-        }
 
-        return ResponseEntity.status(404).body(new ErrorResponse("Movie not found in database. Try another id"));
+            }
+            return ResponseEntity
+                    .status(404)
+                    .body(new ErrorResponse("Movie not found in database. Try another id"));
+        } catch (HttpClientErrorException.NotFound e) {
+            return ResponseEntity
+                    .status(500)
+                    .body(new ErrorResponse("Error occurred with message :" + e.getMessage()));
+        }
     }
 
     public ResponseEntity<WsResponse> saveMovieById(Long movieId) {
@@ -143,6 +166,10 @@ public class ApiService {
             return ResponseEntity
                     .status(404)
                     .body(new ErrorResponse("Movie couldn't be saved due to not found"));
+        } catch (ResourceAccessException e) {
+            return ResponseEntity
+                    .status(503)
+                    .body(new ErrorResponse("Service unavailable. Please check your network connection."));
         }
     }
 
@@ -194,14 +221,18 @@ public class ApiService {
             Optional<Movie> movie = movieRepository.findById(movieId);
 
             if (movie.isEmpty()) {
-                return ResponseEntity.status(404).body("Movie not found in database.");
+                return ResponseEntity
+                        .status(404)
+                        .body("Movie not found in database.");
             }
 
             movieRepository.deleteById(movieId);
             return ResponseEntity.ok().body("Movie deleted successfully.");
 
         } catch (HttpClientErrorException.NotFound e) {
-            return ResponseEntity.status(404).body("Movie not found in database.");
+            return ResponseEntity
+                    .status(404)
+                    .body("Movie not found in database.");
         }
     }
 
