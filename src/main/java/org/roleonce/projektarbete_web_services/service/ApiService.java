@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,11 +21,12 @@ import java.util.Optional;
 @Service
 public class ApiService {
 
-    private final RestTemplate restTemplate;
+    //private final RestTemplate restTemplate;
+    private final WebClient webClient;
     private final MovieRepository movieRepository;
 
-    public ApiService(RestTemplate restTemplate, MovieRepository movieRepository) {
-        this.restTemplate = restTemplate;
+    public ApiService(WebClient.Builder webclientBuilder, MovieRepository movieRepository) {
+        this.webClient = webclientBuilder.build();
         this.movieRepository = movieRepository;
     }
 
@@ -37,20 +39,29 @@ public class ApiService {
         String url = apiUrl + movieId + "?api_key=" + apiKey;
 
         try {
-            ResponseEntity<Movie> response = restTemplate.getForEntity(url, Movie.class);
+            Movie movie = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(Movie.class)
+                    .block(); // Blockar tills svaret kommer
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Movie movie = response.getBody();
+            if (movie != null) {
                 return ResponseEntity.ok(new MovieResponse(movie));
+            } else {
+                return ResponseEntity
+                        .status(404)
+                        .body(new ErrorResponse("Movie not found."));
             }
-            return ResponseEntity
-                    .status(response.getStatusCode())
-                    .body(new ErrorResponse("Unexpected error: " + response.getStatusCode()));
         } catch (HttpClientErrorException.NotFound e) {
             return ResponseEntity
                     .status(404)
                     .body(new ErrorResponse("Movie not found."));
-        } catch (ResourceAccessException e) {
+        } catch (WebClientResponseException e) {
+            return ResponseEntity
+                    .status(e.getStatusCode())
+                    .body(new ErrorResponse("Unexpected error: " + e.getStatusCode()));
+        }
+        catch (ResourceAccessException e) {
             return ResponseEntity
                     .status(503)
                     .body(new ErrorResponse("Service unavailable. Please check your network connection."));
@@ -148,7 +159,11 @@ public class ApiService {
         String url = apiUrl + movieId + "?api_key=" + apiKey;
 
         try {
-            Movie movie = restTemplate.getForObject(url, Movie.class);
+            Movie movie = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(Movie.class)
+                    .block();
 
             if (movie == null) {
                 return ResponseEntity
@@ -166,7 +181,12 @@ public class ApiService {
             return ResponseEntity
                     .status(404)
                     .body(new ErrorResponse("Movie couldn't be saved due to not found"));
-        } catch (ResourceAccessException e) {
+        } catch (WebClientResponseException e) {
+            return ResponseEntity
+                    .status(e.getStatusCode())
+                    .body(new ErrorResponse("Unexpected error: " + e.getStatusCode()));
+        }
+        catch (ResourceAccessException e) {
             return ResponseEntity
                     .status(503)
                     .body(new ErrorResponse("Service unavailable. Please check your network connection."));
